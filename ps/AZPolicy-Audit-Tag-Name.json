@@ -1,0 +1,23 @@
+{
+  "if": {
+    "not": {
+      "anyOf": [
+        {
+          "field": "[concat('tags[', parameters('tagName'), ']')]",
+          "equals": "[parameters('tagValue1')]"
+        },
+        {
+          "field": "[concat('tags[', parameters('tagName'), ']')]",
+          "equals": "[parameters('tagValue2')]"
+        },
+        {
+          "field": "[concat('tags[', parameters('tagName'), ']')]",
+          "equals": "[parameters('tagValue3')]"
+        }
+      ]
+      } 
+  },
+  "then": {
+    "effect": "audit"
+  }
+}

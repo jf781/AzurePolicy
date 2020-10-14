@@ -1,0 +1,21 @@
+{
+  "mode": "Indexed",
+  "policyRule": {
+    "if": {
+      "field": "[concat('tags[',parameters('tagName1'),']')]",
+      "exists": "false"
+    },
+    "then": {
+      "effect": "audit"
+    }
+  },
+  "parameters": {
+    "tagName1": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Tag to audit",
+        "description": "Provide the tag name that you wish to audit for"
+      }
+    }
+  }
+}

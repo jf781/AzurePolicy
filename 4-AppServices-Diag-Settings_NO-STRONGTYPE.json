@@ -1,0 +1,237 @@
+{
+  "mode": "All",
+  "policyRule": {
+    "if": {
+      "field": "type",
+      "equals": "Microsoft.Web/sites"
+    },
+    "then": {
+      "effect": "deployIfNotExists",
+      "details": {
+        "type": "Microsoft.Insights/diagnosticSettings",
+        "name": "[parameters('profileName')]",
+        "existenceCondition": {
+          "allOf": [
+            {
+              "field": "Microsoft.Insights/diagnosticSettings/logs.enabled",
+              "matchInsensitively": "[parameters('appServiceHTTPLogs')]"
+            },
+            {
+              "field": "Microsoft.Insights/diagnosticSettings/metrics.enabled",
+              "matchInsensitively": "[parameters('allMetrics')]"
+            },
+            {
+              "field": "Microsoft.Insights/diagnosticSettings/workspaceId",
+              "matchInsensitively": "[parameters('logAnalyticsWorkspace')]"
+            }
+          ]
+        },
+        "roleDefinitionIds": [
+          "/providers/microsoft.authorization/roleDefinitions/2cc479cb-7b4d-49a8-b449-8c00fd0f0a4b",
+          "/providers/microsoft.authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293",
+          "/providers/microsoft.authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa"
+        ],
+        "deployment": {
+          "properties": {
+            "mode": "incremental",
+            "template": {
+              "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+              "contentVersion": "1.0.0.0",
+              "parameters": {
+                "serverName": {
+                  "type": "string"
+                },
+                "profileName": {
+                  "type": "string"
+                },
+                "logAnalyticsWorkspace": {
+                  "type": "string"
+                },
+                "appServiceAppLogs": {
+                  "type": "string"
+                },
+                "appServiceHTTPLogs": {
+                  "type": "string"
+                },
+                "appServiceConsoleLogs": {
+                  "type": "string"
+                },
+                "appServiceFileAuditLogs": {
+                  "type": "string"
+                },
+                "appServiceAuditLogs": {
+                  "type": "string"
+                },
+                "allMetrics": {
+                  "type": "string"
+                }
+              },
+              "resources": [
+                {
+                  "type": "Microsoft.Web/sites/providers/diagnosticSettings",
+                  "name": "[concat(parameters('serverName'), '/Microsoft.Insights/', parameters('profileName'))]",
+                  "apiVersion": "2017-05-01-preview",
+                  "properties": {
+                    "workspaceId": "[parameters('logAnalyticsWorkspace')]",
+                    "logs": [
+                      {
+                        "category": "AppServiceHTTPLogs",
+                        "enabled": "[parameters('appServiceHTTPLogs')]"
+                      },
+                      {
+                        "category": "AppServiceConsoleLogs",
+                        "enabled": "[parameters('appServiceConsoleLogs')]"
+                      },
+                      {
+                        "category": "AppServiceAppLogs",
+                        "enabled": "[parameters('appServiceAppLogs')]"
+                      },
+                      {
+                        "category": "AppServiceFileAuditLogs",
+                        "enabled": "[parameters('AppServiceFileAuditLogs')]"
+                      },
+                      {
+                        "category": "AppServiceAuditLogs",
+                        "enabled": "[parameters('appServiceAuditLogs')]"
+                      }
+                    ],
+                    "metrics": [
+                      {
+                        "category": "AllMetrics",
+                        "enabled": "[parameters('allMetrics')]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "outputs": {
+                "policy": {
+                  "type": "string",
+                  "value": "[concat(parameters('serverName'),' - Is now sending diagnostic logs to Log Analytics Workspace:', parameters('logAnalyticsWorkspace'))]"
+                }
+              }
+            },
+            "parameters": {
+              "serverName": {
+                "value": "[field('name')]"
+              },
+              "profileName": {
+                "value": "[parameters('profileName')]"
+              },
+              "logAnalyticsWorkspace": {
+                "value": "[parameters('logAnalyticsWorkspace')]"
+              },
+              "appServiceHTTPLogs": {
+                "value": "[parameters('appServiceHTTPLogs')]"
+              },
+              "appServiceConsoleLogs": {
+                "value": "[parameters('appServiceConsoleLogs')]"
+              },
+              "appServiceAppLogs": {
+                "value": "[parameters('appServiceAppLogs')]"
+              },
+              "appServiceFileAuditLogs": {
+                "value": "[parameters('appServiceFileAuditLogs')]"
+              },
+              "appServiceAuditLogs": {
+                "value": "[parameters('appServiceAuditLogs')]"
+              },
+              "allMetrics": {
+                "value": "[parameters('allMetrics')]"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "profileName": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Profile name",
+        "description": "The diagnostic settings profile name"
+      },
+      "defaultValue": "setByPolicy"
+    },
+    "logAnalyticsWorkspace": {
+      "type": "string",
+      "metadata": {
+        "displayName": "Log Analyitcs workspace",
+        "description": "Select the Log Analytics workspace from dropdown list"
+      }
+    },
+    "appServiceHTTPLogs": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Enable App Service HTTP Logging ",
+        "description": "Whether to enable Web server logs - True or False"
+      },
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "defaultValue": "true"
+    },
+    "appServiceConsoleLogs": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Enable App Service Console Logging ",
+        "description": "Whether to log 'Standard output and standard errors' - True or False"
+      },
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "defaultValue": "true"
+    },
+    "appServiceAppLogs": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Enable App Service Application Logging ",
+        "description": "Whether to log Application activity - True or False"
+      },
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "defaultValue": "true"
+    },
+    "appServiceFileAuditLogs": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Enable App Service File Audit Logging ",
+        "description": "Whether to log 'File changes via FTP and Kudu' - True or False"
+      },
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "defaultValue": "true"
+    },
+    "appServiceAuditLogs": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Enable App Service Audit Logging ",
+        "description": "Whether to log 'Login activity via FTP and Kudu' - True or False"
+      },
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "defaultValue": "true"
+    },
+    "allMetrics": {
+      "type": "String",
+      "metadata": {
+        "displayName": "Enable metric monitoring ",
+        "description": "Logs all metrics available to Microsoft.Web/Sites provider - True or False"
+      },
+      "allowedValues": [
+        "true",
+        "false"
+      ],
+      "defaultValue": "true"
+    }
+  }
+}
